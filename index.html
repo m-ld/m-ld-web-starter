@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Collaborative Form Application</title>
+</head>
+<body>
+<p>Welcome to the application!</p>
+<form id="goto-form">
+    <label>Form:
+        <input>
+    </label>
+    <button disabled>Create or Edit</button>
+</form>
+<script>
+  const gotoForm = document.querySelector('#goto-form');
+  const gotoInput = /**@type {HTMLElement}*/document.querySelector('#goto-form input');
+  const gotoButton = document.querySelector('#goto-form button');
+  gotoInput.addEventListener('input', () => {
+    gotoButton.disabled = !gotoInput.value.match(/^[0-9a-z-]{1,63}$/);
+    gotoForm.setAttribute('action',
+      new URL(`form/${encodeURIComponent(gotoInput.value)}`, window.location.href));
+  });
+  gotoInput.focus();
+</script>
+</body>
+</html>

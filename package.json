@@ -4,7 +4,7 @@
   "description": "Starter project for web applications using m-ld and Javascript",
   "main": "index.js",
   "scripts": {
-    "build": "browserify client.js -o bundle.js",
+    "build": "browserify form.js -o bundle.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
