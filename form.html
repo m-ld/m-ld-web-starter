@@ -4,23 +4,71 @@
     <meta charset="UTF-8">
     <title>Form</title>
     <script src="/bundle.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        table td, table th {
+            border: 1px solid darkgrey;
+        }
+        input[type="number"] {
+            width: 3em;
+        }
+    </style>
 </head>
 <body>
-<p>Welcome to <span id="form-name"></span></p>
-<p><span id="message" hidden></span></p>
+<p>Welcome to form <span id="form-name"></span></p>
 <div id="party-template" hidden>
     <label>Name:
-        <input class="name">
+        <input class="party-name">
     </label>
-    <button>x</button>
+    <button class="party-delete">×</button>
 </div>
 <div id="parties"></div>
 <div>
     <button id="add-party">Add Party</button>
 </div>
 <hr>
+<table id="items">
+    <thead>
+    <tr>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Stock</th>
+        <th>Unit price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr id="item-template" hidden>
+        <td>
+            <select class="item-product">
+                <option>a</option>
+                <option>b</option>
+                <option>c</option>
+                <option>d</option>
+                <option>e</option>
+            </select>
+        </td>
+        <td>
+            <input class="item-quantity" type="number">
+        </td>
+        <td>
+            <input class="item-stock" type="number">
+        </td>
+        <td>
+            <input class="item-price" type="number">
+        </td>
+        <td>
+            <button class="item-up">↑</button>
+            <button class="item-down">↓</button>
+            <button class="item-delete">×</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
 <div>
     <button id="add-item">Add Item</button>
 </div>
+<p><span id="message" hidden></span></p>
 </body>
 </html>
