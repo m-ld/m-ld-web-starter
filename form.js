@@ -2,68 +2,125 @@ const { clone, shortId, uuid, asSubjectUpdates } = require('@m-ld/m-ld');
 const { IoRemotes } = require('@m-ld/m-ld/dist/socket.io');
 const MemDown = require('memdown');
 
+/**
+ * Manages display of the form content by manipulating the DOM in response to events in the local
+ * **m-ld** clone.
+ */
 class FormController {
   constructor() {
+    // Get the form ID from the page URL
     const formId = /** @type {string} */
       window.location.pathname.split('/').slice(-1)[0];
     getElement('form-name').textContent = formId;
     getElement('add-party').disabled = true;
     getElement('add-item').disabled = true;
     const itemTableBody = getElement('items', 'tbody');
+
+    // The clone method initialises the m-ld engine and resolves a clone (hereafter called 'meld')
     clone(new MemDown, IoRemotes, {
+      // Unique clone identifier
       '@id': uuid(),
+      // The m-ld domain name (must conform to an IETF domain name)
       '@domain': `${formId}.web-starter.m-ld.org`,
+      // The 'genesis' is given to us via the server, and indicates whether this domain is brand-new
       genesis: getCookie('is-genesis') === 'true',
+      // Change this flag to reduce console logging by m-ld
       logLevel: 'debug'
     }).then(async meld => {
+      // We call the clone 'meld'
       this.meld = meld;
+      // Wait for the clone to be fully up-to-date.
       await meld.status.becomes({ outdated: false });
-      // Get the latest data and populate the form
-      meld.read(async state => {
-        (await state.read({
-          '@describe': '?id',
-          '@where': { '@id': '?id', '@type': 'party' }
-        })).forEach(party => this.appendPartyElement(party));
-        (await state.read({
-          '@construct': { '@id': 'items', '@list': { '?': { '@id': '?', '?': '?' } } }
-        }))[0]?.['@list'].forEach(item => this.updateItemElement(item, itemTableBody
-          .appendChild(this.createItemElement(item['@id']))));
-        // Good to go!
-        getElement('add-party').disabled = false;
-        getElement('add-item').disabled = false;
-      }, async (update, state) => {
-        await Promise.all(Object.entries(asSubjectUpdates(update)).map(async ([id, subjectUpdate]) => {
-          const element = getElement(id);
-          if (element?.classList.contains('party')) {
-            const party = await this.describe(state, id);
-            if (party != null)
-              this.updatePartyElement(party, element);
-            else
-              element.remove();
-          } else if (subjectUpdate['@insert']?.['@type'] === 'party') {
-            this.appendPartyElement(subjectUpdate['@insert']);
-          } else if (element?.classList.contains('item')) {
-            const item = await this.describe(state, id);
-            if (item != null)
-              this.updateItemElement(item, element);
-          } else if (id === 'items') {
-            // Load the list (just item references) and sync
-            const itemRefs = (await this.describe(state, 'items'))?.['@list'] ?? [];
-            let prev = getElement('item-template'), toLoad = [];
-            for (let { '@id': id } of itemRefs) {
-              const element = getElement(id) ?? (toLoad.push(id) && this.createItemElement(id));
-              prev.insertAdjacentElement('afterend', element);
-              prev = element;
+      // Read the latest data from m-ld and populate the form.
+      meld.read(
+        // The read method holds the clone state constant until the first callback resolves, so we
+        // can be sure nothing is changing. The second callback is called for every update
+        // afterwards.
+        async state => {
+          // Each 'party' is a stand-alone subject in the domain. Just describe every subject marked
+          // as the 'party' type.
+          const parties = await state.read({
+            '@describe': '?id',
+            '@where': { '@id': '?id', '@type': 'party' }
+          });
+          parties.forEach(party => this.appendPartyElement(party));
+          // The 'items' are stored as a list, which has the fixed identity 'items'. Using
+          // construct, which does a pattern match, we can retrieve not only the identities of the
+          // items but also their contents.
+          const itemsList = await state.read({
+            '@construct': {
+              '@id': 'items',
+              // This says: retrieve every list index ('?' denotes a variable), and for the item in
+              // each index give me every property and value (the variable names are just for
+              // readability, they could all just be '?')
+              '@list': { '?index': { '@id': '?itemId', '?prop': '?value' } }
             }
-            while (prev.nextElementSibling)
-              prev.nextElementSibling.remove();
-            await Promise.all(toLoad.map(async id => {
-              this.updateItemElement(await this.describe(state, id), getElement(id));
-            }));
-          }
-        }));
-      });
+          });
+          itemsList[0]?.['@list'].forEach(item => {
+            const itemElement = itemTableBody.appendChild(this.createItemElement(item['@id']));
+            this.updateItemElement(item, itemElement);
+          });
+          // Ready for user input!
+          getElement('add-party').disabled = false;
+          getElement('add-item').disabled = false;
+        },
+        // For every update, the state is held constant while we process it, until
+        // the returned promise resolves.
+        async (update, state) => {
+          // There are many possible ways to handle updates. Here, we generally ignore the
+          // fine-grained update information and just load the current state of the affected
+          // subject (party or item). First we re-arrange the update to be indexed by subject ID.
+          await Promise.all(Object.entries(asSubjectUpdates(update)).map(async ([id, subjectUpdate]) => {
+            // Do we already have an element for the updated subject?
+            const element = getElement(id);
+            if (element?.classList.contains('party')) {
+              // If the subject is a party for which we already have an element, describe the
+              // current party in full and update the element.
+              const party = await this.describe(state, id);
+              if (party != null)
+                this.updatePartyElement(party, element);
+              else
+                element.remove();
+            } else if (subjectUpdate['@insert']?.['@type'] === 'party') {
+              // If the update is a brand-new party we haven't seen before, we don't need to load
+              // the current state as it's all in the update itself.
+              this.appendPartyElement(subjectUpdate['@insert']);
+            } else if (element?.classList.contains('item')) {
+              // If the subject is an item for which we already have an element, describe the
+              // current item in full and update the element.
+              const item = await this.describe(state, id);
+              if (item != null)
+                this.updateItemElement(item, element);
+            } else if (id === 'items') {
+              // If the items list content has changed, describe the items list in full. Note that
+              // using describe will only load the item references, not all the contents. That's
+              // fine because we probably already have some of the item content, and we can be more
+              // surgical about what state to ask m-ld for.
+              const itemRefs = (await this.describe(state, 'items'))?.['@list'] ?? [];
+              // Items will appear in-order after the hidden item HTML template
+              let prev = getElement('item-template'), toLoad = [];
+              for (let { '@id': id } of itemRefs) {
+                // If we don't already have the item content in an element, we'll need to load it.
+                // For now just create a placeholder element.
+                const element = getElement(id) ?? (toLoad.push(id) && this.createItemElement(id));
+                prev.insertAdjacentElement('afterend', element);
+                prev = element;
+              }
+              // After going through all the current items, if there are any elements left over
+              // these must have been removed from the form and we can safely delete them.
+              while (prev.nextElementSibling)
+                prev.nextElementSibling.remove();
+              // Finally, load every item we hadn't seen already in full
+              await Promise.all(toLoad.map(async id => {
+                this.updateItemElement(await this.describe(state, id), getElement(id));
+              }));
+            }
+          }));
+        });
 
+      // When the Add buttons are clicked, write a new party or item to m-ld. Note that we don't
+      // immediately add the HTML, since we'll be notified of our own update and we do it then,
+      // just the same as if another clone had added the new content.
       getElement('add-party').addEventListener('click', () => {
         meld.write({ '@id': shortId(), '@type': 'party', name: 'enter party name' })
           .catch(this.showError);
@@ -72,6 +129,7 @@ class FormController {
         meld.write({
           '@id': 'items',
           '@list': {
+            // We want to append to the list, so the insert index is the child element count
             [getElement('items', 'tbody').childElementCount]:
               { '@id': shortId(), '@type': 'item', qty: 1 }
           }
@@ -203,23 +261,39 @@ class FormController {
 
   showError = err => {
     switch (err.status) {
-      case 5031: return this.showMessage(
-        '⚠️ This form exists but no-one is around to load it from.', 'olive');
+      case 5031:
+        return this.showMessage(
+          '⚠️ This form exists but no-one is around to load it from.', 'olive');
       default:
         return this.showMessage(`❌ ${err}`, 'red');
     }
   };
 }
 
+/**
+ * Shorthand to get a page Element reference
+ * @param id {HTMLElement|string} the Element to start with, or its `id`
+ * @param [subSelector] {string|undefined} a selector for a descendant of the identified Element
+ * @returns {HTMLElement} the identified element or one of its descendants
+ */
 function getElement(id, subSelector) {
   const element = id instanceof HTMLElement ? id : document.getElementById(id);
   return subSelector == null ? element : element.querySelector(subSelector);
 }
 
+/**
+ * Gets a cookie value with a given name
+ * @param name the cookie name
+ * @returns {string} the cookie value
+ */
 function getCookie(name) {
   return document.cookie.match(`(?:^|;) ?${name}=([^;]*)(?:;|$)`)[1];
 }
 
+/**
+ * Create the controller for the form page, and register an unload listener which checks if the
+ * local clone is a 'silo' (it is the last clone in the domain), and warns the user if so.
+ */
 window.onload = () => {
   const form = new FormController();
   window.addEventListener('beforeunload', e => {

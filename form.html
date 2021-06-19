@@ -18,6 +18,7 @@
 </head>
 <body>
 <p>Welcome to form <span id="form-name"></span></p>
+<!-- When new parties are added, this template node is cloned below -->
 <div id="party-template" hidden>
     <label>Name:
         <input class="party-name">
@@ -39,6 +40,7 @@
     </tr>
     </thead>
     <tbody>
+    <!-- When new items are added, this template node is cloned below -->
     <tr id="item-template" hidden>
         <td>
             <select class="item-product">
@@ -69,6 +71,7 @@
 <div>
     <button id="add-item">Add Item</button>
 </div>
+<!-- Messages to the user are put into the span when needed -->
 <p><span id="message" hidden></span></p>
 </body>
 </html>
