@@ -138,10 +138,21 @@ class FormController {
     }).catch(this.showError);
   }
 
+  /**
+   * Shorthand for retrieving the properties of some subject from the m-ld clone as a Javascript
+   * object
+   * @param state the m-ld state being read from
+   * @param id the identity of the subject
+   * @returns {Promise<object|undefined>}
+   */
   async describe(state, id) {
     return (await state.read({ '@describe': id }))[0];
   }
 
+  /**
+   * Add a new Party HTML element to the page and initialise it with the given properties
+   * @param party {object} the subject
+   */
   appendPartyElement(party) {
     const element = this.createSubjectElement(party['@id'], 'party');
     this.addPropertyInputListener(element, 'party', 'name');
@@ -152,10 +163,19 @@ class FormController {
     getElement(element, '.party-name').select();
   }
 
+  /**
+   * Update a party HTML element with the current properties from the app state
+   * @param party {object} the subject
+   * @param element {HTMLElement} the party HTML element
+   */
   updatePartyElement(party, element) {
     this.updatePropertyInput(element, 'party', party, 'name');
   }
 
+  /**
+   * Add a new Item HTML table row to the page (it must be initialised with properties separately)
+   * @param id {object} the Item identity
+   */
   createItemElement(id) {
     const element = this.createSubjectElement(id, 'item');
     this.addPropertyInputListener(element, 'item', 'product', 'quantity', 'stock', 'price');
@@ -177,11 +197,22 @@ class FormController {
     return element;
   }
 
+  /**
+   * Shorthand to get the Item HTML elements, excluding the template row
+   * @returns {HTMLElement[]} an array of Item HTML table rows
+   */
   get itemNodes() {
     // Note item template is at position 0
     return [].slice.call(getElement('items', 'tbody').children, 1);
   }
 
+  /**
+   * Shorthand for moving an item in the items list
+   * @param id the identity of the item to move
+   * @param oldIndex the index of the element prior to moving it
+   * @param newIndex the new index of the element. Note that this new index is relative to the
+   *   original list (not to the modified list).
+   */
   writeMoveItem(id, oldIndex, newIndex) {
     this.meld.write({
       '@delete': {
@@ -195,11 +226,22 @@ class FormController {
     }).catch(this.showError);
   }
 
+  /**
+   * Update an Item HTML table row with the current properties from the app state
+   * @param item {object} the subject
+   * @param element {HTMLElement} Item HTML table row to update
+   */
   updateItemElement(item, element) {
     this.updatePropertyInput(element, 'item', item,
       'product', 'quantity', 'stock', 'price');
   }
 
+  /**
+   * Generic method to clone some HTML from a template and set it up to be populated with data
+   * @param id the identity of the Subject whose data will occupy the returned element
+   * @param clazz the type of the Subject
+   * @returns {HTMLElement} the created (unpopulated) HTML element
+   */
   createSubjectElement(id, clazz) {
     const element = /** @type {HTMLElement} */
       getElement(`${clazz}-template`).cloneNode(true);
@@ -209,6 +251,13 @@ class FormController {
     return element;
   }
 
+  /**
+   * Generic method to set up input listeners on the sub-element HTMLInputElements of the given
+   * element, which push the changes to the local clone.
+   * @param element the parent element corresponding to the Subject
+   * @param clazz the type of the Subject
+   * @param properties property names, each of which must have a corresponding input
+   */
   addPropertyInputListener(element, clazz, ...properties) {
     for (let property of properties) {
       const input = getElement(element, `.${clazz}-${property}`);
@@ -234,6 +283,14 @@ class FormController {
     }
   }
 
+  /**
+   * Update input elements, descendants of the given parent element, with property values from the
+   * given Subject.
+   * @param element the parent element corresponding to the Subject
+   * @param clazz the type of the Subject
+   * @param subject the Subject instance
+   * @param properties property names, each of which must have a corresponding input
+   */
   updatePropertyInput(element, clazz, subject, ...properties) {
     for (let property of properties) {
       const input = getElement(element, `.${clazz}-${property}`);
