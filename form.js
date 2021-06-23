@@ -25,7 +25,9 @@ class FormController {
       // The 'genesis' is given to us via the server, and indicates whether this domain is brand-new
       genesis: getCookie('is-genesis') === 'true',
       // Change this flag to reduce console logging by m-ld
-      logLevel: 'debug'
+      logLevel: 'debug',
+      // Apply a single-valued constraint to one of the fields, for illustration
+      constraints: [{  '@type': 'single-valued', property: 'quantity' }]
     }).then(async meld => {
       // We call the clone 'meld'
       this.meld = meld;
