@@ -131,7 +131,7 @@ class FormController {
           '@list': {
             // We want to append to the list, so the insert index is the child element count
             [getElement('items', 'tbody').childElementCount]:
-              { '@id': shortId(), '@type': 'item', quantity: "1" }
+              { '@id': shortId(), '@type': 'item', quantity: 1 }
           }
         }).catch(this.showError);
       });
@@ -260,21 +260,22 @@ class FormController {
    */
   addPropertyInputListener(element, clazz, ...properties) {
     for (let property of properties) {
-      const input = getElement(element, `.${clazz}-${property}`);
+      const input = /**@type {HTMLInputElement}*/getElement(element, `.${clazz}-${property}`);
       input.addEventListener('input', () => {
         this.meld.write(async state => {
           const selectOld = await state.read({
             '@select': '?old',
             '@where': { '@id': element.id, [property]: '?old' }
           });
-          const old = selectOld[0]?.['?old'];
-          if (old != null) {
+          const oldValue = selectOld[0]?.['?old'];
+          const newValue = input.type === 'number' ? Number(input.value) : input.value;
+          if (oldValue != null) {
             await state.write({
-              '@delete': { '@id': element.id, [property]: old },
-              '@insert': { '@id': element.id, [property]: input.value }
+              '@delete': { '@id': element.id, [property]: oldValue },
+              '@insert': { '@id': element.id, [property]: newValue }
             });
           } else {
-            await state.write({ '@id': element.id, [property]: input.value });
+            await state.write({ '@id': element.id, [property]: newValue });
           }
         }).catch(this.showError);
         // Also hide any previous message when the user acts
