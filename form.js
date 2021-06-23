@@ -131,7 +131,7 @@ class FormController {
           '@list': {
             // We want to append to the list, so the insert index is the child element count
             [getElement('items', 'tbody').childElementCount]:
-              { '@id': shortId(), '@type': 'item', qty: 1 }
+              { '@id': shortId(), '@type': 'item', quantity: "1" }
           }
         }).catch(this.showError);
       });
