@@ -42,10 +42,6 @@ This app makes the following choices for configuring **m-ld**.
 - Clones use in-memory storage (no persistent storage).
 - Communication between clones uses [Socket.io](https://socket.io/).
 
-🚧 Note that the socket.io remotes provider is currently in the pre-release
-version of **m-ld** on npm. Use `npm install @m-ld/m-ld@edge` in your own
-project.
-
 ![architecture](./web-starter.svg)
 
 > **m-ld** is **not** inherently a client-server technology. We are
