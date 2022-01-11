@@ -18,9 +18,9 @@
   },
   "homepage": "https://github.com/m-ld/m-ld-web-starter#readme",
   "dependencies": {
-    "@m-ld/m-ld": "^0.7.0",
+    "@m-ld/m-ld": "^0.8.0",
     "express": "^4.17.1",
-    "memdown": "^6.0.0",
+    "memdown": "^6.1.1",
     "socket.io": "^4.1.2",
     "socket.io-client": "^4.1.2"
   },
