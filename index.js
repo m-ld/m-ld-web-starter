@@ -1,7 +1,7 @@
 const express = require('express');
 const socket = require('socket.io');
 const { join } = require('path');
-const { IoRemotesService } = require('@m-ld/m-ld/dist/socket.io-server');
+const { IoRemotesService } = require('@m-ld/m-ld/ext/socket.io-server');
 
 // Create an Express app to serve the static files and the form page (see below)
 const app = express();

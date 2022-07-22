@@ -1,5 +1,5 @@
 const { clone, shortId, uuid, asSubjectUpdates } = require('@m-ld/m-ld');
-const { IoRemotes } = require('@m-ld/m-ld/dist/socket.io');
+const { IoRemotes } = require('@m-ld/m-ld/ext/socket.io');
 const MemDown = require('memdown');
 
 /**
