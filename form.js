@@ -1,6 +1,6 @@
 const { clone, shortId, uuid, asSubjectUpdates } = require('@m-ld/m-ld');
-const { IoRemotes } = require('@m-ld/m-ld/dist/socket.io');
-const MemDown = require('memdown');
+const { IoRemotes } = require('@m-ld/m-ld/ext/socket.io');
+const { MemoryLevel } = require('memory-level');
 
 /**
  * Manages display of the form content by manipulating the DOM in response to events in the local
@@ -17,7 +17,7 @@ class FormController {
     const itemTableBody = getElement('items', 'tbody');
 
     // The clone method initialises the m-ld engine and resolves a clone (hereafter called 'meld')
-    clone(new MemDown, IoRemotes, {
+    clone(new MemoryLevel, IoRemotes, {
       // Unique clone identifier
       '@id': uuid(),
       // The m-ld domain name (must conform to an IETF domain name)
