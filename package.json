@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/m-ld/m-ld-web-starter#readme",
   "dependencies": {
-    "@m-ld/m-ld": "^0.9.0-edge.1",
+    "@m-ld/m-ld": "^0.9.0",
     "express": "^4.17.1",
     "memory-level": "^1.0.0",
     "socket.io": "^4.1.2",
