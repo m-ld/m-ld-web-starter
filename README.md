@@ -8,11 +8,10 @@ web app.
 ## running the app
 
 1. Install [Node.js](https://nodejs.org/)
-1. Clone this repository
-1. In the project root, install dependencies with `npm install`
-1. Build the project with `npm run build`
-1. Run the server with `node index.js`
-1. In a browser, navigate to http://localhost:3000/
+2. Clone this repository
+3. In the project root, install dependencies with `npm install`
+4. Run the server with `node index.js`
+5. In a browser, navigate to the indicated localhost URL
 
 ## walkthrough
 
@@ -55,8 +54,7 @@ This app makes the following choices for configuring **m-ld**.
 - The server code is in [`index.js`](./index.js).
 - The landing page is [`index.html`](./index.html).
 - The form page is [`form.html`](./form.html).
-- The Javascript for the form page is [`form.js`](./form.js), which is bundled
-  in the build step using [Browserify](https://browserify.org/) to `bundle.js`.
+- The Javascript for the form page is [`form.js`](./form.js).
 
 ## enhancements
 
@@ -68,7 +66,10 @@ at all.
 
 Here are some basic things to consider:
 
-1. The form data could be persisted, even during editing, in browser persistent
+1. We are using the browser bundle of **m-ld** for convenience (look at the
+   imports in `form.js`). In a real application we might choose to include **m-ld**
+   as a package dependency in our Javascript build pipeline.
+2. The form data could be persisted, even during editing, in browser persistent
    storage, or by having another clone on the server (not just a passive message
    passing service). This would mean it's possible to look at an existing form
    even if no-one else is.
