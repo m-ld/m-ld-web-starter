@@ -3,10 +3,6 @@
   "version": "0.2.0",
   "description": "Starter project for web applications using m-ld and Javascript",
   "main": "index.js",
-  "scripts": {
-    "build": "browserify form.js -o bundle.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/m-ld/m-ld-web-starter.git"
@@ -18,13 +14,8 @@
   },
   "homepage": "https://github.com/m-ld/m-ld-web-starter#readme",
   "dependencies": {
-    "@m-ld/m-ld": "^0.9.0",
+    "@m-ld/m-ld": "^0.10.0-edge.1",
     "express": "^4.17.1",
-    "memory-level": "^1.0.0",
-    "socket.io": "^4.1.2",
-    "socket.io-client": "^4.1.2"
-  },
-  "devDependencies": {
-    "browserify": "^17.0.0"
+    "socket.io": "^4.1.2"
   }
 }

@@ -5,16 +5,15 @@ const { IoRemotesService } = require('@m-ld/m-ld/ext/socket.io-server');
 
 // Create an Express app to serve the static files and the form page (see below)
 const app = express();
-const staticFiles = ['/', '/bundle.js', '/index.html'];
+const staticFiles = ['/', '/form.js', '/index.html'];
 app.get(staticFiles, (req, res) => {
   res.sendFile(join(__dirname, req.path.split('/').slice(-1)[0] || 'index.html'));
 });
 
 // Create and run an HTTP server for Express and Socket.io
 const httpServer = require('http').createServer(app);
-const port = 3000;
-httpServer.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+httpServer.listen(0, () => {
+  console.log(`Example app listening at http://localhost:${httpServer.address().port}`);
 });
 
 // Start the Socket.io server, and attach the m-ld message-passing service

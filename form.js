@@ -1,6 +1,9 @@
-const { clone, shortId, uuid, asSubjectUpdates } = require('@m-ld/m-ld');
-const { IoRemotes } = require('@m-ld/m-ld/ext/socket.io');
-const { MemoryLevel } = require('memory-level');
+// For local dev with m-ld-js, using the `doc-dev` script, replace
+// `https://edge.js.m-ld.org` with `http://localhost:3000`
+
+import { asSubjectUpdates, clone, shortId, uuid } from 'https://edge.js.m-ld.org/ext/index.mjs';
+import { IoRemotes } from 'https://edge.js.m-ld.org/ext/socket.io.mjs';
+import { MemoryLevel } from 'https://edge.js.m-ld.org/ext/memory-level.mjs';
 
 /**
  * Manages display of the form content by manipulating the DOM in response to events in the local
