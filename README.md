@@ -5,6 +5,11 @@ _Starter project for web apps using **m-ld** and Javascript_
 This app demonstrates using **m-ld** to enable collaborative form-filling in a
 web app.
 
+Note there are two branches to reflect versions of **m-ld**: `main` uses the
+latest release; `edge` uses the latest pre-release with forthcoming features.
+See the [**m-ld** GitHub project](https://github.com/orgs/m-ld/projects/4) for
+feature status.
+
 ## running the app
 
 1. Install [Node.js](https://nodejs.org/)
