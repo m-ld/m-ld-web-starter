@@ -1,6 +1,8 @@
+[![Project Status: Abandoned – Initial development has started, but there has not yet been a stable, usable release; the project has been abandoned and the author(s) do not intend on continuing development.](https://www.repostatus.org/badges/latest/abandoned.svg)](https://www.repostatus.org/#abandoned)
+
 # m-ld-web-starter
 
-_Starter project for web apps using **m-ld** and Javascript_
+> ⚠️ This project has been abandoned, because the code was not well related to how web apps are really built. We are working on a successor, the [Collaborative TodoMVC App](https://github.com/m-ld/m-ld-todomvc-vanillajs), please check it out!
 
 This app demonstrates using **m-ld** to enable collaborative form-filling in a
 web app.
